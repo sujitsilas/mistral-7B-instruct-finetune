@@ -1,1 +1,1 @@
-# ministral-3-14B-finetune
+# mistral-7B-instruct-finetune

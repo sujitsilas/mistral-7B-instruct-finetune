@@ -1,0 +1,21 @@
+data:
+  instruct_data: /home/scumpia-mrl/Desktop/Sujit/Projects/mistral-7B-instruct-finetune/data/train_instruct.jsonl
+  data: ''
+  eval_instruct_data: /home/scumpia-mrl/Desktop/Sujit/Projects/mistral-7B-instruct-finetune/data/val_instruct.jsonl
+model_id_or_path: /home/scumpia-mrl/Desktop/Sujit/Projects/mistral-7B-instruct-finetune/models
+lora:
+  rank: 64
+seq_len: 16384
+batch_size: 8
+max_steps: 500
+optim:
+  lr: 6.0e-05
+  weight_decay: 0.1
+  pct_start: 0.05
+seed: 42
+log_freq: 10
+eval_freq: 100
+no_eval: false
+ckpt_freq: 100
+save_adapters: true
+run_dir: /home/scumpia-mrl/Desktop/Sujit/Projects/mistral-7B-instruct-finetune/output/run_001

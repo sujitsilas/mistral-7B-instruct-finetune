@@ -1,0 +1,27 @@
+[2025-12-09 12:08:44,946] torch.distributed.run: [WARNING] 
+[2025-12-09 12:08:44,946] torch.distributed.run: [WARNING] *****************************************
+[2025-12-09 12:08:44,946] torch.distributed.run: [WARNING] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+[2025-12-09 12:08:44,946] torch.distributed.run: [WARNING] *****************************************
+/home/scumpia-mrl/Desktop/Sujit/Projects/mistral-7B-instruct-finetune/mistral-finetune/.venv/lib/python3.11/site-packages/mistral_common/tokens/instruct/request.py:7: FutureWarning: This file is deprecated and will be deleted in v1.9.0, please import as follows instead: 
+`from mistral_common.protocol.fim.request import FimRequest` 
+ or 
+`from mistral_common.protocol.instruct.request import InstructRequest`
+  warnings.warn(
+/home/scumpia-mrl/Desktop/Sujit/Projects/mistral-7B-instruct-finetune/mistral-finetune/.venv/lib/python3.11/site-packages/mistral_common/tokens/instruct/request.py:7: FutureWarning: This file is deprecated and will be deleted in v1.9.0, please import as follows instead: 
+`from mistral_common.protocol.fim.request import FimRequest` 
+ or 
+`from mistral_common.protocol.instruct.request import InstructRequest`
+  warnings.warn(
+args: TrainArgs(data=DataArgs(data='', shuffle=False, instruct_data='/home/scumpia-mrl/Desktop/Sujit/Projects/mistral-7B-instruct-finetune/data/train_instruct.jsonl', eval_instruct_data='/home/scumpia-mrl/Desktop/Sujit/Projects/mistral-7B-instruct-finetune/data/val_instruct.jsonl', instruct=InstructArgs(shuffle=True, dynamic_chunk_fn_call=True)), model_id_or_path='/home/scumpia-mrl/Desktop/Sujit/Projects/mistral-7B-instruct-finetune/models', run_dir='/home/scumpia-mrl/Desktop/Sujit/Projects/mistral-7B-instruct-finetune/output/run_001', optim=OptimArgs(lr=6e-05, weight_decay=0.1, pct_start=0.05), seed=42, num_microbatches=1, seq_len=16384, batch_size=8, max_norm=1.0, max_steps=500, log_freq=10, ckpt_freq=100, save_adapters=True, no_ckpt=False, num_ckpt_keep=3, eval_freq=100, no_eval=False, checkpoint=True, world_size=2, wandb=WandbArgs(project=None, offline=False, key=None, run_name=None), mlflow=MLFlowArgs(tracking_uri=None, experiment_name=None), lora=LoraArgs(enable=True, rank=64, dropout=0.0, scaling=2.0))
+2025-12-09 12:08:47 (PST) - 0:00:02 - distributed - INFO - torch.cuda.device_count: 2
+2025-12-09 12:08:47 (PST) - 0:00:02 - distributed - INFO - CUDA_VISIBLE_DEVICES: all
+2025-12-09 12:08:47 (PST) - 0:00:02 - distributed - INFO - local rank: 1
+2025-12-09 12:08:47 (PST) - 0:00:02 - distributed - INFO - Set cuda device to 1
+args: TrainArgs(data=DataArgs(data='', shuffle=False, instruct_data='/home/scumpia-mrl/Desktop/Sujit/Projects/mistral-7B-instruct-finetune/data/train_instruct.jsonl', eval_instruct_data='/home/scumpia-mrl/Desktop/Sujit/Projects/mistral-7B-instruct-finetune/data/val_instruct.jsonl', instruct=InstructArgs(shuffle=True, dynamic_chunk_fn_call=True)), model_id_or_path='/home/scumpia-mrl/Desktop/Sujit/Projects/mistral-7B-instruct-finetune/models', run_dir='/home/scumpia-mrl/Desktop/Sujit/Projects/mistral-7B-instruct-finetune/output/run_001', optim=OptimArgs(lr=6e-05, weight_decay=0.1, pct_start=0.05), seed=42, num_microbatches=1, seq_len=16384, batch_size=8, max_norm=1.0, max_steps=500, log_freq=10, ckpt_freq=100, save_adapters=True, no_ckpt=False, num_ckpt_keep=3, eval_freq=100, no_eval=False, checkpoint=True, world_size=2, wandb=WandbArgs(project=None, offline=False, key=None, run_name=None), mlflow=MLFlowArgs(tracking_uri=None, experiment_name=None), lora=LoraArgs(enable=True, rank=64, dropout=0.0, scaling=2.0))
+2025-12-09 12:08:47 (PST) - 0:00:02 - distributed - INFO - torch.cuda.device_count: 2
+2025-12-09 12:08:47 (PST) - 0:00:02 - distributed - INFO - CUDA_VISIBLE_DEVICES: all
+2025-12-09 12:08:47 (PST) - 0:00:02 - distributed - INFO - local rank: 0
+2025-12-09 12:08:47 (PST) - 0:00:02 - distributed - INFO - Set cuda device to 0
+2025-12-09 12:08:47 (PST) - 0:00:02 - train - INFO - Going to init comms...
+2025-12-09 12:08:47 (PST) - 0:00:02 - train - INFO - Run dir: /home/scumpia-mrl/Desktop/Sujit/Projects/mistral-7B-instruct-finetune/output/run_001
+2025-12-09 12:08:47 (PST) - 0:00:02 - train - INFO - Going to init comms...

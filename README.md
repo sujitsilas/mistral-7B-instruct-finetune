@@ -14,8 +14,7 @@ Domain adaptation of [Mistral-7B-Instruct-v0.3](https://huggingface.co/mistralai
 ## Requirements
 
 ### Hardware
-- **Recommended**: 2x NVIDIA RTX 5000 Ada (33GB each) or equivalent
-- **Minimum**: NVIDIA GPU with 16GB+ VRAM (RTX 3090/4090, V100, etc.)
+- **Minimum**: NVIDIA GPU with 24GB+ VRAM (RTX 3090/4090, A5000, etc.)
 - **Storage**: ~50GB for model weights and outputs
 
 ### Software
@@ -23,7 +22,7 @@ Domain adaptation of [Mistral-7B-Instruct-v0.3](https://huggingface.co/mistralai
 - CUDA 11.8+ or 12.1+
 - PyTorch 2.0+
 
-> **Note**: This setup is optimized for **2x RTX 5000 Ada GPUs (33GB VRAM each)**.
+> **Note**: This setup is optimized for **single GPU training (31GB VRAM)**. Multi-GPU training is supported but not required.
 
 ## Quick Start
 
@@ -68,21 +67,11 @@ Your training data (`rag_eval_QA.csv`) is already in the repository. The noteboo
 ```bash
 jupyter notebook mistral_7b_finetune.ipynb
 ```
-
-Then execute all cells sequentially. The notebook handles:
-1. **Environment setup** - Create directories and paths
-2. **Data preparation** - Convert CSV → JSONL format (239 train / 27 val samples)
-3. **Model download** - Download Mistral-7B-Instruct-v0.3 (~14GB)
-4. **Training config** - Generate optimized LoRA configuration
-5. **Fine-tuning** - Train with mistral-finetune (1-3 hours depending on GPU)
-6. **Evaluation** - Test on validation set
-7. **Export** - Merge and save final model
-
 ## Advanced Usage
 
 ### Training Configuration
 
-Default hyperparameters (optimized for 266 Q&A samples on 2x RTX 5000 Ada):
+Default hyperparameters (optimized for 239 Q&A samples on single GPU):
 
 ```yaml
 # Data
@@ -93,37 +82,34 @@ val_samples: 27 (10%)
 model: Mistral-7B-Instruct-v0.3
 lora_rank: 64
 
-# Training (2x RTX 5000 Ada - 33GB each)
-seq_len: 16384       # 16K context for longer engineering documents
-batch_size: 8        # Total across 2 GPUs (4 per GPU)
+# Training (Single GPU - 31GB VRAM)
+seq_len: 4096        # 4K context (optimized for memory)
+batch_size: 1        # Batch size per GPU
 max_steps: 500       # ~2 epochs
 learning_rate: 6e-5
 weight_decay: 0.1
 ```
 
-**Memory usage per GPU**: ~20-24GB VRAM with these settings (out of 33GB available).
+> **Note**: You can increase `seq_len` to 8192 or `batch_size` to 2 if you have more VRAM available.
 
 ### Command Line Training
 
 If you prefer to skip the notebook and train directly:
 
-**Recommended - Dual GPU (2x RTX 5000 Ada - 33GB):**
+**Single GPU (Recommended):**
 ```bash
 cd mistral-finetune
-torchrun --nproc_per_node=2 train.py ../train_config.yaml
+./run_train.sh
 ```
 
-**Single GPU (reduce batch_size to 4 in config):**
+**Multi-GPU (2+ GPUs):**
 ```bash
 cd mistral-finetune
-torchrun --nproc_per_node=1 train.py ../train_config.yaml
+export CUDA_VISIBLE_DEVICES=0,1  # Use GPUs 0 and 1
+torchrun --nproc_per_node=2 --master_port=29500 train.py ../train_config.yaml
 ```
 
-**4+ GPUs:**
-```bash
-cd mistral-finetune
-torchrun --nproc_per_node=4 train.py ../train_config.yaml  # Adjust count
-```
+> **Note**: For multi-GPU, you'll need to increase `batch_size` and `seq_len` in the config to utilize the additional memory.
 
 ## Project Structure
 
@@ -182,45 +168,6 @@ answer = tokenizer.decode(outputs[0], skip_special_tokens=True)
 print(answer)
 ```
 
-## Monitoring Training
-
-### Training Logs
-Monitor training progress in real-time:
-```bash
-tail -f output/run_001/logs/train.log
-```
-
-### Weights & Biases (Optional)
-Enable W&B logging by updating `train_config.yaml`:
-```yaml
-wandb:
-  project: "mistral-7b-engineering-qa"
-  run_name: "engineering-docs-lora"
-  key: "your-wandb-api-key"
-  offline: False
-```
-
-## Hyperparameter Tuning
-
-### Memory Optimization
-If you encounter OOM errors on RTX 5000 Ada (33GB):
-- Reduce `batch_size` (8 → 4, or 4 → 2 per GPU)
-- Reduce `seq_len` (16384 → 8192)
-- Reduce `lora_rank` (64 → 32)
-- Use gradient checkpointing (automatically enabled in mistral-finetune)
-
-**Note**: With 33GB VRAM, you have plenty of headroom. You could even increase to:
-- `seq_len: 32768` (full 32K context) with `batch_size: 4`
-- `lora_rank: 128` for better adaptation
-- `batch_size: 12` (6 per GPU) for faster training
-
-### Performance Tuning
-For better adaptation:
-- Increase `max_steps` (500 → 1000)
-- Adjust `learning_rate` (try 3e-5 or 1e-4)
-- Increase `lora_rank` (64 → 128)
-- Add more training data
-
 ## Output Files
 
 After training completes:
@@ -232,47 +179,10 @@ After training completes:
 
 ## Performance Notes
 
-### Training Time (500 steps)
-- **2x RTX 5000 Ada (33GB)**: ~1-1.5 hours ⭐ (Your setup - 16K context, batch 8)
-- **Single RTX 5000 Ada (33GB)**: ~2-2.5 hours
-- **2x RTX 5000 Ada (16GB)**: ~1.5-2 hours (8K context, batch 4)
-- **Single A100 (80GB)**: ~1-2 hours
-- **Single RTX 4090**: ~2-3 hours
-
 ### Model Size
 - **Base Model**: ~14GB (FP16)
 - **LoRA Adapters**: ~200MB (rank 64)
 - **Merged Model**: ~14GB
-
-## Troubleshooting
-
-### CUDA Out of Memory
-```bash
-# Reduce memory footprint
-batch_size: 1
-seq_len: 4096
-lora_rank: 32
-```
-
-### NumPy Compatibility Error
-If you see "A module that was compiled using NumPy 1.x cannot be run in NumPy 2.x":
-```bash
-cd mistral-finetune
-uv pip install "numpy<2"
-```
-
-### Missing Dependencies
-```bash
-cd mistral-finetune
-uv pip install --upgrade mistral-common transformers torch accelerate peft
-```
-
-### Import Errors (Already Fixed)
-The repository includes fixes for `InstructTokenizerBase` import errors with mistral-common>=1.3.1.
-If you encounter issues, verify imports use:
-```python
-from mistral_common.tokens.tokenizers.instruct import InstructTokenizerBase
-```
 
 ## References
 
